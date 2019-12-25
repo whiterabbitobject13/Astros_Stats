@@ -1,0 +1,121 @@
+filename = "report.txt"
+open(filename, 'w').close()
+
+def main():
+    infile = open('Astros.txt', 'r')
+    lists = []
+    i = 0
+
+    for data in infile.readlines():
+        if i != 0:
+            lists.append(data.split('\t'))
+        i = i + 1
+    infile.close()
+
+    doBattingAverage(lists)
+    add_break()
+    on_base_percentage = doOnBasePercentage(lists)
+    add_break()
+    slugging_percentage = doSluggingPercentage(lists)
+    add_break()
+    doOnBasePlusSlugging(lists, on_base_percentage, slugging_percentage)
+    add_break()
+    doRunsProduced(lists)
+    add_break()
+    doRunsPerPlayerAppearance(lists)
+    add_break()
+    doSinglesCalc(lists)
+
+
+def doBattingAverage(lists):
+    # hits + doubles + (2*triples) + (3*home runs) / at bats
+    write_file("Batting Average\n\n")
+    for stats in lists:
+        avg = round( \
+            (int(stats[3]) + int(stats[4]) + (2 * int(stats[5])) + (3 * int(stats[6]))) \
+            / int(stats[1]) \
+        , 3)
+        output = stats[0] + '\t\t' + str(avg) + '\n'
+        write_file(output)
+
+def doOnBasePercentage(lists):
+    # (hits + bb + hbp)/(ab + bb + hbp + sf)
+    on_base_percentages = []
+    write_file("On Base Percentage\n\n")
+    for stats in lists:
+        on_base_percentage = round( \
+            (int(stats[3]) + int(stats[8]) + int(stats[10])) \
+            / (int(stats[1]) + int(stats[8]) + int(stats[10]) + int(stats[11])) \
+        , 3)
+        on_base_percentages.append(on_base_percentage)
+        output = stats[0] + '\t\t' + str(on_base_percentage) + '\n'
+        write_file(output)
+    return on_base_percentages
+    
+def doSluggingPercentage(lists):
+    # (singles + 2*doubles + 3*triples + 4*homeruns)/at_bats
+    slugging_percentages = []
+    write_file("Slugging Percentage\n\n")
+    for stats in lists:
+        slugging_percentage = round( \
+            (int(stats[2]) + (2 * int(stats[4])) + (3 *int(stats[5])) + (4 * int(stats[6]))) \
+            / int(stats[1]) \
+        , 3)
+        slugging_percentages.append(slugging_percentage)
+        output = stats[0] + '\t\t' + str(round(slugging_percentage, 3)) + '\n'
+        write_file(output)
+    return slugging_percentages
+    
+def doOnBasePlusSlugging(lists, on_base_percentages, slugging_percentages):
+    i = 0
+    write_file("On Base Plus Slugging\n\n")
+    for stats in lists:
+        on_base_plus_slugging = round( \
+            on_base_percentages[i] + slugging_percentages[i] \
+        , 3)
+        output = stats[0] + '\t\t' + str(on_base_plus_slugging) + '\n'
+        write_file(output)
+        i = i + 1
+        
+def doRunsProduced(lists):
+    # (rbi * 
+    write_file("Runs Produced\n\n")
+    for stats in lists:
+        runs_produced = round( \
+            (int(stats[7]) * (int(stats[7]) + int(stats[2]) - int(stats[6]))) \
+        , 3)
+        output = stats[0] + '\t\t' + str(runs_produced) + '\n'
+        write_file(output)
+
+def doRunsPerPlayerAppearance(lists):
+    # (runs + rbi - home_runs) / (ab + bb + hbp + sf)
+    write_file("Runs Per Player Appearance\n\n")
+    for stats in lists:
+        runs_per_player_appearance = round( \
+            (int(stats[2]) + int(stats[7]) - int(stats[6])) \
+            / (int(stats[1]) + int(stats[8]) + int(stats[10]) + int(stats[11])) \
+        , 3)
+        output = stats[0] + '\t\t' + str(runs_per_player_appearance) + '\n'
+        write_file(output)
+
+def doSinglesCalc(lists):
+    # (home runs + triples + doubles) - (hits)
+    write_file("Singles\n\n")
+    for stats in lists:
+        singles_calc = round( \
+            (int(stats[3])) \
+            - (int(stats[6]) + int(stats[5]) + int(stats[4])) \
+        , 3)
+        output = stats[0] + '\t\t' + str(singles_calc) + '\n'
+        write_file(output)
+
+def write_file(data):
+    file = open(filename, 'a+')
+    file.write(data)
+    file.close()
+
+def add_break():
+    file = open(filename, 'a+')
+    file.write('\n\n')
+
+main()
